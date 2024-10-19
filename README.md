@@ -4,11 +4,13 @@ Scripts that perform 2D bin packing on Adobe Illustrator artboards and Adobe Ind
 
 ![Demo of Bin Packing Script](./docs/simple-packing-examples.gif)
 
-## Support My Work
+## Show your support
+
+![Profile Picture](https://avatars.githubusercontent.com/u/29587184)
 
 If this project will save you time, please consider supporting me:
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://www.paypal.com/donate?hosted_button_id=SBQHVWHSSTA9Q)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg?style=for-the-badge)](https://www.paypal.com/donate?hosted_button_id=SBQHVWHSSTA9Q)
 
 ---
 
@@ -62,8 +64,6 @@ See [How To Install Scripts in Adobe Illustrator](https://creativepro.com/how-to
    - **Allow rotation** Allow items to be rotated by 90° during packing.
 
 ![Script User Interface](./docs/ui.png)
-
-<img src="./docs/ui.png" alt="Script User Interface" style="max-width: 150px;"/>
 
 ---
 
