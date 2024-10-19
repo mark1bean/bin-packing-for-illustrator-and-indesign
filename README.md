@@ -63,6 +63,8 @@ See [How To Install Scripts in Adobe Illustrator](https://creativepro.com/how-to
 
 ![Script User Interface](./docs/ui.png)
 
+<img src="./docs/ui.png" alt="Script User Interface" style="max-width: 150px;"/>
+
 ---
 
 ## Author
