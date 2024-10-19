@@ -17,7 +17,8 @@ If this project will save you time, please consider supporting me:
 ### Step 1: Download the Scripts
 
 Download script files (zipped):
- [![Download](https://img.shields.io/badge/download-latest-blue.svg?style=for-the-badge)](https://github.com/mark1bean/bin-packing-for-illustrator-and-indesign/archive/refs/heads/main.zip)
+
+[![Download](https://img.shields.io/badge/download-latest-blue.svg?style=for-the-badge)](https://github.com/mark1bean/bin-packing-for-illustrator-and-indesign/archive/refs/heads/main.zip)
 
 The repository contains the following script files:
 
