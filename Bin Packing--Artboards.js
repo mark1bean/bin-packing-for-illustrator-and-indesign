@@ -232,6 +232,19 @@ function packItemsIllustrator(settings, randomAttempt) {
     if (pb)
         pb.setItemsPackedProgress(0, totalItemCount);
 
+    // rotate the items to fit best in rectangle
+    if (allowAnyRotation) {
+
+        for (var i = 0; i < items.length; i++) {
+
+            if (allowAnyRotation)
+                // rotate item to fit smallest rectangle
+                items[i].rotate(- findRotationByMinimalBoundsIllustrator(items[i]));
+
+        }
+
+    }
+
     var bestAttempt;
 
     attemptsLoop:
@@ -244,10 +257,6 @@ function packItemsIllustrator(settings, randomAttempt) {
 
         // make a fresh array of 'blocks' which will store positioning information
         for (var j = 0, block; j < items.length; j++) {
-
-            if (allowAnyRotation)
-                // rotate item to fit smallest rectangle
-                items[j].rotate(-findRotationByMinimalBoundsIllustrator(items[j]));
 
             block = new Block(settings, items[j], j);
             attempt.remainingBlocks.push(block);

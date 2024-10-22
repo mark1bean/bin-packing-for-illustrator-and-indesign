@@ -61,7 +61,8 @@ See [How To Install Scripts in Adobe Illustrator](https://creativepro.com/how-to
    - **Try Harder:** Whether to continue testing new attempts even after all items are successfully packed. Do this if you are looking for a better packing result.
    - **Random Packing:** Perform a single random-shuffle packing for an aesthetic or experimental result.
    - **Custom Scoring:** Choose to prefer either packing more items or maximizing the packed area.
-   - **Allow rotation** Allow items to be rotated by 90° during packing.
+   - **Allow 90° rotation** Allow items to be rotated by 90° during packing.
+   - **Allow any rotation** Allow items to be rotated so that they fit best into a rectangle. This will generally achieve tighter packing, but will rotate the items by arbitrary amount between 0 and 90°.
 
 ![Script User Interface](./docs/ui.png)
 

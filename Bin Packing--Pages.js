@@ -280,10 +280,29 @@ function packItemsIndesign(settings, randomAttempt) {
 
     if (pb) pb.setItemsPackedProgress(0, totalItemCount);
 
+    // rotate the items to fit best in rectangle
+    if (allowAnyRotation) {
+
+        for (var i = 0, angle; i < items.length; i++) {
+
+            angle = findRotationByMinimalBoundsIndesign(items[i]);
+
+            // rotate item to fit smallest rectangle
+            items[i].transform(
+                CoordinateSpaces.pasteboardCoordinates,
+                AnchorPoint.CENTER_ANCHOR,
+                app.transformationMatrices.add({ counterclockwiseRotationAngle: - angle }),
+            );
+
+        }
+
+    }
+
     var bestAttempt;
 
     attemptsLoop:
     for (var a = 0; a < maxAttemptCount; a++) {
+        $.writeln('attempt ' + a);
 
         if (pb)
             pb.setAttemptProgress(a + 1, maxAttemptCount);
@@ -291,22 +310,10 @@ function packItemsIndesign(settings, randomAttempt) {
         var attempt = new Attempt(a, bins);
 
         // make a fresh array of 'blocks' which will store positioning information
-        for (var j = 0, block; j < items.length; j++) {
+        for (var i = 0, block; i < items.length; i++) {
+            $.writeln('  item ' + i);
 
-            if (allowAnyRotation) {
-
-                var angle = -findRotationByMinimalBoundsIndesign(items[j]);
-
-                // rotate item to fit smallest rectangle
-                items[j].transform(
-                    CoordinateSpaces.pasteboardCoordinates,
-                    AnchorPoint.CENTER_ANCHOR,
-                    app.transformationMatrices.add({ counterclockwiseRotationAngle: -angle }),
-                );
-
-            }
-
-            block = new Block(settings, items[j], j);
+            block = new Block(settings, items[i], i);
             attempt.remainingBlocks.push(block);
 
             if (a == 0)
