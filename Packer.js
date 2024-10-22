@@ -1,12 +1,12 @@
 /**
- * Bin packing algorithm by trentium: https://stackoverflow.com/users/7696162/trentium
+ * Packer: helper to provide 2D rectangular bin packing.
+ * By trentium: https://stackoverflow.com/users/7696162/trentium
  * from here: https://stackoverflow.com/questions/56642111/bin-packing-js-implementation-using-box-rotation-for-best-fit
  *
- * modified by m1b to conform with ExtendScript syntax and minor functionality I wanted
+ * Modified by m1b to conform with ExtendScript syntax and minor functionality I wanted.
  */
-
-Packer = function (w, h, allowRotation) {
-    this.allowRotation = (allowRotation == true);
+Packer = function (w, h, allow90DegreeRotation) {
+    this.allow90DegreeRotation = (allow90DegreeRotation == true);
     this.init(w, h);
 };
 
@@ -136,7 +136,7 @@ Packer.prototype.fit = function (blocks, binIndex) {
             this.adjustHeap(block);
         }
 
-        else if (this.allowRotation) {
+        else if (this.allow90DegreeRotation) {
             // If the block didn't fit in its current orientation,
             // rotate its dimensions and look again.
             block.rotate();

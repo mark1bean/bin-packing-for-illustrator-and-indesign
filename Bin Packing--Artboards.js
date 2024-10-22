@@ -35,7 +35,7 @@
  * See also: "Bin Packing--Pages.js" for Indesign.
  *
  * @author m1b
- * @version 2024-10-13
+ * @version 2024-10-22
  * @discussion https://community.adobe.com/t5/illustrator-discussions/how-to-organize-multiple-different-objects-on-one-sheet-with-a-defined-gap-inbetween-them/m-p/12475475#M295934
  */
 //@include 'Packer.js'
@@ -63,7 +63,12 @@
         margin: '5mm',
 
         // is it okay to rotate 90 degrees?
-        allowRotation: true,
+        allow90DegreeRotation: true,
+
+        // is it okay to rotate any amount?
+        // if so, items will be first rotated to fit best into a rectangle
+        // in practice this may cause rotation between 0 and 90°
+        allowAnyRotation: true,
 
         // choose 'count' to prefer item count,
         // or 'area' to prefer area packed
@@ -77,7 +82,7 @@
         maxAttemptCount: undefined,
 
         // should we stop on first successul packing, or keep trying to improve?
-        // when this is on, the packing will take a lot longer, but might be better
+        // when this is on, the packing will always make `maxAttemptCount` attempts.
         tryHarder: false,
 
         // shows the UI options
@@ -142,7 +147,8 @@
  * @param {Number} [settings.margin] - the distance between artboard edge and bin, if applicable (default: 0).
  * @param {Boolean} [settings.useGuidesToDivideBins] - whether to divide artboard bin by guides (default: false).
  * @param {Number} [settings.guidesMargin] - the margin to leave either side of each guide. (default: 0)
- * @param {Boolean} [settings.allowRotation] - whether to allow rotation by 90° (default: true).
+ * @param {Boolean} [settings.allow90DegreeRotation] - whether to allow rotation by 90° (default: false).
+ * @param {Boolean} [settings.allowArbitraryRotation] - whether to allow rotation by any amount to better fit into a rectangle (default: false).
  * @param {String} [settings.bestFitBy] - can be 'count' or 'area' (default: 'count').
  * @param {Number} [settings.maxAttemptCount] - the maximum number of attempts made (default: calculated).
  * @param {Boolean} [settings.tryHarder] - whether to keep trying, even after all items are packed (default: false).
@@ -166,7 +172,8 @@ function packItemsIllustrator(settings, randomAttempt) {
         items = settings.items || doc.selection,
         padding = settings.padding || 0,
         margin = settings.margin || 0,
-        allowRotation = settings.allowRotation || false,
+        allow90DegreeRotation = true === settings.allow90DegreeRotation,
+        allowAnyRotation = true === settings.allowAnyRotation,
         bestFitBy = settings.bestFitBy || 'count',
         maxAttemptCount = randomAttempt ? 1 : (settings.maxAttemptCount || getMaxAttemptCount(items.length)),
         preferCount = (bestFitBy == 'count'),
@@ -222,7 +229,8 @@ function packItemsIllustrator(settings, randomAttempt) {
         return;
     }
 
-    if (pb) pb.setItemsPackedProgress(0, totalItemCount);
+    if (pb)
+        pb.setItemsPackedProgress(0, totalItemCount);
 
     var bestAttempt;
 
@@ -236,6 +244,10 @@ function packItemsIllustrator(settings, randomAttempt) {
 
         // make a fresh array of 'blocks' which will store positioning information
         for (var j = 0, block; j < items.length; j++) {
+
+            if (allowAnyRotation)
+                // rotate item to fit smallest rectangle
+                items[j].rotate(-findRotationByMinimalBoundsIllustrator(items[j]));
 
             block = new Block(settings, items[j], j);
             attempt.remainingBlocks.push(block);
@@ -258,7 +270,7 @@ function packItemsIllustrator(settings, randomAttempt) {
             var bin = bins[i],
 
                 // instantiate Trentium's packer
-                packer = new Packer(bin.width, bin.height, allowRotation),
+                packer = new Packer(bin.width, bin.height, allow90DegreeRotation),
 
                 // do the fitting
                 result = packer.fit(attempt.remainingBlocks, i);
@@ -269,13 +281,13 @@ function packItemsIllustrator(settings, randomAttempt) {
             attempt.remainingBlocks = result.remainingBlocks.slice();
 
             // calculate score for this bin
-            var scoreFactor = (true == preferCount)
+            var scoreFactor = preferCount
                 ? totalItemCount / result.count
                 : totalItemArea / result.area;
 
             attempt.score += ((bin.width * bin.height) / result.area) * scoreFactor;
 
-            // add a line to info for this attempt
+            // add info for this attempt
             attempt.info.push('Packed ' + result.count + ' items onto artboard ' + (i + 1) + '.');
 
             packer.destroy();
@@ -399,6 +411,7 @@ function ui(settings) {
 
         checkboxGroup = panel2.add('group {orientation:"column", alignment:["left","top"], alignChildren: ["left","top"], margins:[0,20,0,0], preferredSize: [120,-1] }'),
         allowRotationCheckbox = checkboxGroup.add("Checkbox { alignment:'left', text:'Allow 90° rotation', margins:[0,10,0,0], value:false }"),
+        allowAnyRotationCheckbox = checkboxGroup.add("Checkbox { alignment:'left', text:'Allow any rotation', margins:[0,10,0,0], value:false }"),
         tryHarderCheckbox = checkboxGroup.add("Checkbox { alignment:'left', text:'Try harder', margins:[0,10,0,0], value:false }"),
         disableSortingCheckbox = checkboxGroup.add("Checkbox { alignment:'left', text:'Do not sort', margins:[0,10,0,0], value:false }"),
 
@@ -424,7 +437,8 @@ function ui(settings) {
     marginField.text = String(settings.margin);
     paddingField.text = String(settings.padding);
     maxAttemptsField.text = String(settings.maxAttemptCount);
-    allowRotationCheckbox.value = settings.allowRotation;
+    allowRotationCheckbox.value = settings.allow90DegreeRotation;
+    allowAnyRotationCheckbox.value = settings.allowAnyRotation;
     tryHarderCheckbox.value = settings.tryHarder;
     disableSortingCheckbox.value = settings.doNotSort;
     showResultsCheckbox.value = settings.showResults;
@@ -479,7 +493,8 @@ function ui(settings) {
         settings.margin = marginField.text;
         settings.maxAttemptCount = Number(maxAttemptsField.text);
         settings.bestFitBy = bestFitMenu.selection.index == 0 ? 'count' : 'area';
-        settings.allowRotation = allowRotationCheckbox.value;
+        settings.allow90DegreeRotation = allowRotationCheckbox.value;
+        settings.allowAnyRotation = allowAnyRotationCheckbox.value;
         settings.tryHarder = tryHarderCheckbox.value;
         settings.doNotSort = disableSortingCheckbox.value;
         settings.showResults = showResultsCheckbox.value;
@@ -693,7 +708,7 @@ function showResults(settings, attempt) {
     else
         w.center();
 
-        app.redraw();
+    app.redraw();
 
     return w.show();
 

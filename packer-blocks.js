@@ -32,10 +32,6 @@ function Attempt(index, bins) {
  */
 function Block(settings, item, index) {
 
-    var getItemBounds = APP_IS_ILLUSTRATOR
-        ? getItemBoundsIllustrator
-        : getItemBoundsIndesign;
-
     var bounds = APP_IS_ILLUSTRATOR
         ? getItemBoundsIllustrator(item)
         : getItemBoundsIndesign(item);
@@ -681,4 +677,170 @@ function getUnitStringAsPoints(str) {
 
     return (rawNumber * convertToPoints);
 
+};
+
+/**
+ * Returns the rotation amount in degrees
+ * that the item needs to be rotated such
+ * that it has a minimal bounding box area.
+ * Assuming that `item` is a rectangular
+ * object, such as a PlacedItem, RasterItem
+ * or a rectangular path item, the resulting
+ * rotation will rotate it so that the sides
+ * of the rectangle align to a factor of 90°.
+ * In other words, it will return the value
+ * required to "unrotate" the item.
+ * @author m1b
+ * @version 2023-08-25
+ * @param {PageItem} item - an Illustrator page item.
+ * @returns {Number}
+ */
+function findRotationByMinimalBoundsIllustrator(item) {
+
+    // we will rotate a copy and leave the original
+    var workingItem = item.duplicate()
+
+    if (undefined !== workingItem.createOutline)
+        workingItem = workingItem.createOutline();
+
+    var convergenceThreshold = 0.001,
+        inc = 45, // the starting rotation increment
+        rotationAmount = 0,
+        prevArea = area(workingItem);
+
+    while (Math.abs(inc) >= convergenceThreshold) {
+
+        workingItem.rotate(inc);
+
+        var newArea = area(workingItem);
+
+        if (newArea < prevArea) {
+            prevArea = newArea;
+            rotationAmount -= inc;
+            inc *= 0.5;
+        }
+
+        else {
+            workingItem.rotate(-inc); // Undo the last rotation
+            inc *= -0.5;
+        }
+
+    }
+
+    // clean up
+    workingItem.remove();
+
+    return round(rotationAmount, 2);
+
+    /**
+     * Returns area of bounding box of `item`.
+     * @param {PageItem} item
+     * @returns {Number}
+     */
+    function area(item) {
+        return item.width * item.height;
+    };
+
+};
+
+/**
+ * Rounds `n` to `places` decimal places.
+ * @param {Number} n - the number to round
+ * @param {Number} places - number of decimal places, can be negative
+ * @returns {Number}
+ */
+function round(n, places) {
+    var m = Math.pow(10, places != undefined ? places : 3);
+    return Math.round(n * m) / m;
+};
+
+/**
+ * Returns the rotation amount in degrees
+ * that the item needs to be rotated such
+ * that it has a minimal bounding box area.
+ * Assuming that `item` is a rectangular
+ * object, such as a PlacedItem, RasterItem
+ * or a rectangular path item, the resulting
+ * rotation will rotate it so that the sides
+ * of the rectangle align to a factor of 90°.
+ * In other words, it will return the value
+ * required to "unrotate" the item.
+ * @author m1b
+ * @version 2024-10-22
+ * @param {PageItem} item - an Indesign page item.
+ * @returns {Number}
+ */
+function findRotationByMinimalBoundsIndesign(item) {
+
+    // we will rotate a copy and leave the original
+    var workingItem = item.duplicate()
+
+    if ('function' === typeof workingItem.createOutlines)
+        workingItem = workingItem.createOutlines()[0];
+
+    var convergenceThreshold = 0.001,
+        inc = 45, // the starting rotation increment
+        rotationAmount = 0,
+        prevArea = area(workingItem);
+
+    while (Math.abs(inc) >= convergenceThreshold) {
+
+        rotate(workingItem, inc);
+
+        var newArea = area(workingItem);
+
+        if (newArea < prevArea) {
+            prevArea = newArea;
+            rotationAmount -= inc;
+            inc *= 0.5;
+        }
+
+        else {
+            // undo the last rotation
+            rotate(workingItem, -inc);
+            inc *= -0.5;
+        }
+
+    }
+
+    // clean up
+    workingItem.remove();
+
+    return round(rotationAmount, 3);
+
+    /**
+     * Returns area of bounding box of `item`.
+     * @param {PageItem} item
+     * @returns {Number}
+     */
+    function area(item) {
+        var b = item.visibleBounds;
+        return (b[3] - b[1]) * (b[2] - b[0]);
+    };
+
+    /**
+     * Rotates `item` by `angle`.
+     * @param {PageItem} item - the item to rotate.
+     * @param {Number} angle - angle in degrees.
+     */
+    function rotate(item, angle) {
+        item.transform(
+            CoordinateSpaces.pasteboardCoordinates,
+            AnchorPoint.CENTER_ANCHOR,
+            app.transformationMatrices.add({ counterclockwiseRotationAngle: angle }),
+        );
+    };
+
+};
+
+
+/**
+ * Rounds `n` to `places` decimal places.
+ * @param {Number} n - the number to round
+ * @param {Number} places - number of decimal places, can be negative
+ * @returns {Number}
+ */
+function round(n, places) {
+    var m = Math.pow(10, places != undefined ? places : 3);
+    return Math.round(n * m) / m;
 };
