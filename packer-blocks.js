@@ -463,11 +463,11 @@ function drawRectangleIllustrator(container, bounds, properties) {
 
     properties = properties || {};
 
-    var rectangle = container.rectangles.add(bounds[1], bounds[0], bounds[2] - bounds[0], -(bounds[3] - bounds[1])); // TLWH
+    var rectangle = container.pathItems.rectangle(bounds[1], bounds[0], bounds[2] - bounds[0], -(bounds[3] - bounds[1])); // TLWH
 
     // defaults
-    rectangle.filled = false;
-    rectangle.stroked = true;
+    rectangle.filled = true;
+    rectangle.stroked = false;
 
     // apply properties
     for (var key in properties)
@@ -771,6 +771,8 @@ function round(n, places) {
  * @returns {Number}
  */
 function findRotationByMinimalBoundsIndesign(item) {
+
+    app.scriptPreferences.enableRedraw = false;
 
     // we will rotate a copy and leave the original
     var workingItem = item.duplicate()
