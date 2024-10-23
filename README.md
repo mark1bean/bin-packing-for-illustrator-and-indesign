@@ -4,6 +4,10 @@ Scripts that perform 2D bin packing on Adobe Illustrator artboards and Adobe Ind
 
 ![Demo of Bin Packing Script](./docs/simple-packing-examples.gif)
 
+Update 2024-10-23: showing new `Allow Any Rotation` capability:
+
+![Demo with rotation](./docs/showing-rotation.png)
+
 ## Show your support
 
 ![Profile Picture](https://avatars.githubusercontent.com/u/29587184)
