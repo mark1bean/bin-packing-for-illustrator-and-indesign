@@ -419,7 +419,7 @@ function ui(settings) {
         bestFitMenu = bestFitGroup.add('dropDownList { preferredSize:[120,-1] }'),
 
         checkboxGroup = panel2.add('group {orientation:"column", alignment:["left","top"], alignChildren: ["left","top"], margins:[0,20,0,0], preferredSize: [120,-1] }'),
-        allowRotationCheckbox = checkboxGroup.add("Checkbox { alignment:'left', text:'Allow 90° rotation', margins:[0,10,0,0], value:false }"),
+        allowRotationCheckbox = checkboxGroup.add("Checkbox { alignment:'left', text:'Allow 90\u00b0 rotation', margins:[0,10,0,0], value:false }"),
         allowAnyRotationCheckbox = checkboxGroup.add("Checkbox { alignment:'left', text:'Allow any rotation', margins:[0,10,0,0], value:false }"),
         tryHarderCheckbox = checkboxGroup.add("Checkbox { alignment:'left', text:'Try harder', margins:[0,10,0,0], value:false }"),
         disableSortingCheckbox = checkboxGroup.add("Checkbox { alignment:'left', text:'Do not sort', margins:[0,10,0,0], value:false }"),
